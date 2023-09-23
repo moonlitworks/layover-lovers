@@ -7,7 +7,8 @@ NaNoRenO 2019 project
 - Writer: Kyoki Chiho
 - Sprites/CG: YayaChann
 - Backgrounds: ThreeAngleWork
-- Logo/UI: Re.Alice
+- Logo: Eriko
+- UI: Re.Alice
 - Music (Departure): Mock Off
 - Music (Arrival): Eyzi
 - Sound (Plane): bolkmar

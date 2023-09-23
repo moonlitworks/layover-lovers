@@ -104,7 +104,8 @@ screen about:
             text "Writer: Kyoki Chiho" style "menu_text" xalign 0.5
             text "Sprites/CG: YayaChann" style "menu_text" xalign 0.5
             text "Backgrounds: ThreeAngleWork" style "menu_text" xalign 0.5
-            text "Logo/UI: Re.Alice" style "menu_text" xalign 0.5
+            text "Logo: Eriko" style "menu_text" xalign 0.5
+            text "UI: Re.Alice" style "menu_text" xalign 0.5
             text "Music (Departure): Mock Off" style "menu_text" xalign 0.5
             text "Music (Arrival): Eyzi" style "menu_text" xalign 0.5
             text "Sound (Plane): bolkmar" style "menu_text" xalign 0.5
