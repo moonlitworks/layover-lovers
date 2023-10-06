@@ -1,4 +1,7 @@
 label male_intro:
+  $ achievement.register("DAN_POV", steam="DAN_POV")
+  $ achievement.steam_position = "bottom right"
+  $ achievement.sync()
   show bg radio with dissolve
   play music "sounds/Arrival.ogg" fadein 2.0 fadeout 2.0
   dj "...Aaand we're back!"

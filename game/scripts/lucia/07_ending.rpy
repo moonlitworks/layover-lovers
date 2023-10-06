@@ -39,5 +39,6 @@ label female_ending:
   girl "Maybe we'll meet each other again, in yet another layover?"
   girl "I'm quite a sleepyhead..."
   girl "So if you spot a worried girl in front of a kiosk because her nap stretched a little too much, you know what to do!"
+  $ achievement.grant("LUCIA_POV")
   scene black with Dissolve(2.0)
   return

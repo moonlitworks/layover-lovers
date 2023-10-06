@@ -222,3 +222,4 @@ init python:
 ## by a slash.
 
 define build.itch_project = "moonlitworks/layover-lovers"
+define config.steam_appid = 2618830

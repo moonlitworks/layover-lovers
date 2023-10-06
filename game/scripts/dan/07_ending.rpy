@@ -34,5 +34,6 @@ label male_ending:
   guy "So, maybe, if luck will be on our side..."
   guy "We'll manage to meet each other again, in another layover."
   guy "Who says a girl can't miss a plane twice?"
+  $ achievement.grant("DAN_POV")
   scene black with Dissolve(2.0)
   return

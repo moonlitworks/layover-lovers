@@ -1,4 +1,7 @@
 label female_intro:
+  $ achievement.register("LUCIA_POV", steam="LUCIA_POV")
+  $ achievement.steam_position = "bottom right"
+  $ achievement.sync()
   show bg radio with dissolve
   play music "sounds/Arrival.ogg" fadein 2.0 fadeout 2.0
   dj "...Aaand we're back!"

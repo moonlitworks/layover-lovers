@@ -15,6 +15,7 @@ image white = Solid("#fff")
 #     return
 
 label start:
+    # init names
     if sex.lower()=="male":
         if name!="":
             $ guyName = name
@@ -23,6 +24,8 @@ label start:
         if name!="":
             $ girlName = name
             $ girl = Character("[name]")
+
+    # story
     $ callLabel('intro')
     $ callLabel('encounter')
     $ callLabel('interlude')
