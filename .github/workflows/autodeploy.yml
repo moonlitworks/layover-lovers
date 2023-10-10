@@ -1,0 +1,142 @@
+name: Autodeploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: self-hosted
+    outputs:
+      build_dir: ${{ steps.renpy_build.outputs.dir }}
+      build_name: ${{ steps.renpy_build.outputs.version }}
+      build_semver: ${{ steps.renpy_build_version.outputs.semver }}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        with:
+          fetch-depth: 0
+      - name: Build RenPy
+        id: renpy_build
+        uses: eyzi/renpy-build-action@master
+        timeout-minutes: 5
+        with:
+          sdk-version: "8.1.1"
+          package: market
+          add-steam-lib: true
+        env:
+          SDL_AUDIODRIVER: dummy
+          SDL_VIDEODRIVER: dummy
+      - name: Get Build SemVer
+        id: renpy_build_version
+        run: echo ::set-output name=semver::"$(echo ${{ steps.renpy_build.outputs.version }} | sed 's/^\w*-//g')"
+      - name: Persist build
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.renpy_build.outputs.version }}
+          path: ${{ steps.renpy_build.outputs.dir }}/${{ steps.renpy_build.outputs.version }}-market.zip
+  
+  deploy-steam:
+    name: Deploy to Steam
+    runs-on: self-hosted
+    if: "contains(github.event.head_commit.message, 'chore(version)')"
+    needs: [build]
+    environment:
+      name: Production
+      url: https://store.steampowered.com/app/2618830/Layover_Lovers/
+    steps:
+      - uses: actions/download-artifact@v3
+        name: Retrieve build
+        with:
+          name: ${{ needs.build.outputs.build_name }}
+          path: ./
+      - name: Unzip Build
+        run: unzip -qq '${{ needs.build.outputs.build_name }}-market.zip' -d '${{ needs.build.outputs.build_name }}-market'
+      # - uses: CyberAndrii/steam-totp@v1
+      #   name: Generate TOTP
+      #   id: steam-totp
+      #   with:
+      #     shared_secret: ${{ secrets.STEAM_SHARED_SECRET }}
+      - uses: game-ci/steam-deploy@main
+        id: steam-deploy
+        with:
+          username: ${{ secrets.STEAM_USERNAME }}
+          # totp: ${{ steps.steam-totp.outputs.code }}
+          configVdf: ${{ secrets.STEAM_CONFIG_VDF }}
+          appId: ${{ secrets.STEAM_APP_ID }}
+          buildDescription: v${{ needs.build.outputs.build_semver }}
+          depot1Path: ${{ needs.build.outputs.build_name }}-market
+          releaseBranch: beta
+      - run: echo "${{ steps.steam-deploy.outputs.manifest }}"
+
+  deploy-itch:
+    name: Deploy to Itch
+    runs-on: self-hosted
+    if: "contains(github.event.head_commit.message, 'chore(version)')"
+    needs: [build]
+    environment:
+      name: Production
+      url: https://moonlitworks.itch.io/layover-lovers
+    steps:
+      - uses: actions/download-artifact@v3
+        name: Retrieve build
+        with:
+          name: ${{ needs.build.outputs.build_name }}
+          path: ./
+      - uses: manleydev/butler-publish-itchio-action@master
+        name: Upload to Itch
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: win-osx-linux
+          ITCH_GAME: layover-lovers
+          ITCH_USER: moonlitworks
+          PACKAGE: ${{ needs.build.outputs.build_name }}-market.zip
+          VERSION: ${{ needs.build.outputs.build_semver }}
+
+  release-github:
+    name: Release on Github
+    runs-on: self-hosted
+    if: "contains(github.event.head_commit.message, 'chore(version)')"
+    needs: [build]
+    environment:
+      name: Production
+      url: ${{ steps.create_release.outputs.html_url }}
+    steps:
+      - uses: actions/download-artifact@v3
+        name: Retrieve build
+        with:
+          name: ${{ needs.build.outputs.build_name }}
+          path: ./
+      - name: Create Github Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        with:
+          tag_name: v${{ needs.build.outputs.build_semver }}
+          release_name: Release v${{ needs.build.outputs.build_semver }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ needs.build.outputs.build_name }}-market.zip
+          asset_name: ${{ needs.build.outputs.build_name }}-market.zip
+          asset_content_type: application/zip
+  
+  cleanup:
+    name: Workflow Cleanup
+    runs-on: self-hosted
+    if: ${{ always() }}
+    needs: [build, deploy-steam, deploy-itch, release-github]
+    steps:
+      - name: Delete build
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: ${{ needs.build.outputs.build_name }}
