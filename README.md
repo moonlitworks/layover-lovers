@@ -1,5 +1,7 @@
 # Layover Lovers visual novel
 
+[![Autodeploy](https://github.com/moonlitworks/layover-lovers/actions/workflows/autodeploy.yml/badge.svg)](https://github.com/moonlitworks/layover-lovers/actions/workflows/autodeploy.yml)
+
 NaNoRenO 2019 project
 
 ## Team
