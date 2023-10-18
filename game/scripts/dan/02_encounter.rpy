@@ -68,7 +68,7 @@ label male_encounter:
   girlUnknown "...What's your name?"
   guy "I'm [guyName]. And yours?"
   girl sorry "I'm [girlName]. And I just wanted to say..."
-  guy "Thank you, [guyName]... For caring enough to help a stranger out!"
+  girl "Thank you, [guyName]... For caring enough to help a stranger out!"
   "She looks me in the eye with indebtedness, her cheeks lightly blushing and her hand gently squeezing my shoulder."
   "I can't help but start to get lost in those big eyes, now happy and free of tears..."
   attendant "Miss?"
